@@ -87,3 +87,22 @@ Job_Application_Tracker/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+
+
+## 🖥️ Screenshots
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### Add Application
+
+![Add Application](screenshots/add-application.png)
+
+### Application Details
+
+![Application Details](screenshots/application-details.png)
+
+### Applications List
+
+![Applications List](screenshots/applications-list.png)
