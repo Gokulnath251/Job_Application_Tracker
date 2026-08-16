@@ -1,0 +1,166 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Application</title>
+
+    <link rel="stylesheet"
+          href="{% static 'applications/style.css' %}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>✏️ Edit Job Application</h1>
+
+    <p class="subtitle">
+        Update your application details.
+    </p>
+
+
+    <form method="POST" class="application-form">
+
+        {% csrf_token %}
+
+
+        <div class="form-group">
+
+            <label>Company Name</label>
+
+            <input
+                type="text"
+                name="company_name"
+                value="{{ application.company_name }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Job Role</label>
+
+            <input
+                type="text"
+                name="job_role"
+                value="{{ application.job_role }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Location</label>
+
+            <input
+                type="text"
+                name="location"
+                value="{{ application.location }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Applied Date</label>
+
+            <input
+                type="date"
+                name="applied_date"
+                value="{{ application.applied_date|date:'Y-m-d' }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Status</label>
+
+            <select name="status">
+
+                <option value="Applied"
+                    {% if application.status == 'Applied' %}
+                        selected
+                    {% endif %}>
+                    Applied
+                </option>
+
+                <option value="Interview"
+                    {% if application.status == 'Interview' %}
+                        selected
+                    {% endif %}>
+                    Interview
+                </option>
+
+                <option value="Selected"
+                    {% if application.status == 'Selected' %}
+                        selected
+                    {% endif %}>
+                    Selected
+                </option>
+
+                <option value="Rejected"
+                    {% if application.status == 'Rejected' %}
+                        selected
+                    {% endif %}>
+                    Rejected
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Notes</label>
+
+            <textarea
+                name="notes"
+                rows="5"
+                placeholder="Add notes..."
+            >{{ application.notes }}</textarea>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="add-btn">
+                Update Application
+            </button>
+
+            <a
+                href="/"
+                class="cancel-btn">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,415 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Job Application Tracker</title>
+
+    <link rel="stylesheet"
+          href="{% static 'applications/style.css' %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div>
+
+                <h1>💼 Job Application Tracker</h1>
+
+                <p class="subtitle">
+                    Track and manage your job applications
+                </p>
+
+            </div>
+
+            <a
+                href="{% url 'add_application' %}"
+                class="add-btn">
+                + Add Application
+            </a>
+
+        </div>
+
+
+        <!-- DASHBOARD -->
+
+        <div class="dashboard">
+
+            <div class="card">
+                <h3>Total Applications</h3>
+                <p>{{ total }}</p>
+            </div>
+
+            <div class="card">
+                <h3>Applied</h3>
+                <p>{{ applied }}</p>
+            </div>
+
+            <div class="card">
+                <h3>Interview</h3>
+                <p>{{ interview }}</p>
+            </div>
+
+            <div class="card">
+                <h3>Selected</h3>
+                <p>{{ selected }}</p>
+            </div>
+
+            <div class="card">
+                <h3>Rejected</h3>
+                <p>{{ rejected }}</p>
+            </div>
+
+        </div>
+
+
+        <!-- ANALYTICS -->
+
+        <div class="analytics-section">
+
+            <div class="analytics-card">
+
+                <h2>📊 Application Analytics</h2>
+
+                <p class="analytics-subtitle">
+                    Overview of your application status
+                </p>
+
+                <div
+                    class="chart-container"
+                    id="chartData"
+                    data-applied="{{ applied }}"
+                    data-interview="{{ interview }}"
+                    data-selected="{{ selected }}"
+                    data-rejected="{{ rejected }}"
+                >
+
+                    <canvas id="applicationChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- APPLICATIONS -->
+
+        <div class="applications-section">
+
+            <div class="section-header">
+
+                <h2>Recent Applications</h2>
+
+                <div class="filters">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-box"
+                        placeholder="Search applications..."
+                    >
+
+                    <select
+                        id="statusFilter"
+                        class="status-filter">
+
+                        <option value="all">
+                            All Statuses
+                        </option>
+
+                        <option value="Applied">
+                            Applied
+                        </option>
+
+                        <option value="Interview">
+                            Interview
+                        </option>
+
+                        <option value="Selected">
+                            Selected
+                        </option>
+
+                        <option value="Rejected">
+                            Rejected
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- APPLICATION LIST -->
+
+            {% if applications %}
+
+                {% for application in applications %}
+
+                    <div
+                        class="application-card"
+                        data-search="{{ application.company_name }} {{ application.job_role }} {{ application.location }}"
+                        data-status="{{ application.status }}"
+                    >
+
+                        <div class="application-info">
+
+                            <h3>
+                                {{ application.company_name }}
+                            </h3>
+
+                            <p class="job-role">
+                                {{ application.job_role }}
+                            </p>
+
+                            <small>
+
+                                📍 {{ application.location }}
+
+                                &nbsp; • &nbsp;
+
+                                📅 Applied on
+                                {{ application.applied_date }}
+
+                            </small>
+
+                        </div>
+
+
+                        <div class="application-status">
+
+                            <span
+                                class="status {{ application.status|lower }}">
+                                {{ application.status }}
+                            </span>
+
+
+                            <!-- VIEW DETAILS -->
+
+                            <a
+                                href="{% url 'application_detail' application.id %}"
+                                class="edit-btn">
+                                👁 View Details
+                            </a>
+
+
+                            <!-- EDIT -->
+
+                            <a
+                                href="{% url 'edit_application' application.id %}"
+                                class="edit-btn">
+                                ✏️ Edit
+                            </a>
+
+
+                            <!-- DELETE -->
+
+                            <a
+                                href="{% url 'delete_application' application.id %}"
+                                class="delete-link">
+                                🗑️ Delete
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        📋
+                    </div>
+
+                    <h3>
+                        No applications yet
+                    </h3>
+
+                    <p>
+                        Start tracking your job applications.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        /* SEARCH + STATUS FILTER */
+
+        const searchInput =
+            document.getElementById("searchInput");
+
+        const statusFilter =
+            document.getElementById("statusFilter");
+
+        const applications =
+            document.querySelectorAll(".application-card");
+
+
+        function filterApplications() {
+
+            const searchText =
+                searchInput.value
+                    .toLowerCase()
+                    .trim();
+
+            const selectedStatus =
+                statusFilter.value;
+
+
+            applications.forEach(function (application) {
+
+                const searchData =
+                    application.dataset.search
+                        .toLowerCase();
+
+                const applicationStatus =
+                    application.dataset.status;
+
+
+                const matchesSearch =
+                    searchData.includes(searchText);
+
+                const matchesStatus =
+                    selectedStatus === "all" ||
+                    applicationStatus === selectedStatus;
+
+
+                if (
+                    matchesSearch &&
+                    matchesStatus
+                ) {
+
+                    application.style.display = "flex";
+
+                } else {
+
+                    application.style.display = "none";
+
+                }
+
+            });
+
+        }
+
+
+        searchInput.addEventListener(
+            "input",
+            filterApplications
+        );
+
+
+        statusFilter.addEventListener(
+            "change",
+            filterApplications
+        );
+
+
+        /* APPLICATION ANALYTICS */
+
+        const chartData =
+            document.getElementById("chartData");
+
+
+        const appliedCount =
+            Number(chartData.dataset.applied);
+
+        const interviewCount =
+            Number(chartData.dataset.interview);
+
+        const selectedCount =
+            Number(chartData.dataset.selected);
+
+        const rejectedCount =
+            Number(chartData.dataset.rejected);
+
+
+        const chartCanvas =
+            document.getElementById("applicationChart");
+
+
+        new Chart(chartCanvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "Applied",
+                    "Interview",
+                    "Selected",
+                    "Rejected"
+                ],
+
+                datasets: [
+
+                    {
+
+                        data: [
+                            appliedCount,
+                            interviewCount,
+                            selectedCount,
+                            rejectedCount
+                        ],
+
+                        borderWidth: 2
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom"
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
